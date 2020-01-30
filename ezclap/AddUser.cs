@@ -25,7 +25,6 @@ namespace ezclap
         {
             foreach (string user in name)
             {
-                Console.WriteLine("[+] Creating user: " + user + "...");
                 try
                 {
                     DirectoryEntry AD = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");

