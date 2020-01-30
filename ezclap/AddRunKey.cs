@@ -6,7 +6,7 @@ namespace ezclap
 	{
 		public AddRunKey (string[] names, string payload)
 		{
-
+            Initialize(names, payload);
 		}
 		public static void Initialize(string[] names, string payload)
 		{

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ServiceProcess;
 
 namespace ezclap
 {
@@ -25,6 +26,21 @@ namespace ezclap
             string description = "Facilitates the running of interactive applications with additional administrative privileges.  If this service is stopped, users will be unable to launch applications with the additional administrative privileges they may require to perform desired user tasks.";
             System.Diagnostics.Process.Start(@"C:\Windows\System32\sc.exe", arguments);
             System.Diagnostics.Process.Start(@"C:\Windows\System32\sc.exe", "description " + serviceName + " \"" + description + "\"");
+        }
+
+        public void StartService(string serviceName, int timeoutMilli)
+        {
+            ServiceController service = new ServiceController(serviceName);
+
+            try{
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilli);
+
+                service.Start();
+                //service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
+            }
         }
     }
 }
