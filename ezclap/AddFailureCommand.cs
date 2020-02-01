@@ -8,7 +8,7 @@ namespace ezclap
         {
             Initialize(services, payload);
         }
-		public static void Initialize(List<string> services, string payload)
+		private static void Initialize(List<string> services, string payload)
         {
             foreach (string service in services)
             {
