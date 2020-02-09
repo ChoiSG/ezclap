@@ -1,5 +1,15 @@
 ﻿using System;
 
+
+/*  Name: AddRunKey 
+ *  Description: Adds the payload in various RunKey registry location. 
+ *  The RunKeys themselves are hardcoded in RegistryKeys.cs, as there are only 7 known 
+ *  RunKey locations that can be used for persistence. 
+ *  
+ *  Params:
+ *      - string[] name = Name of the registry key to be added into RunKey locations 
+ *      - string payload = Payload string to be executed
+ */
 namespace ezclap
 {
 	public class AddRunKey

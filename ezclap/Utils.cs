@@ -4,6 +4,14 @@ using System.Configuration;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
+
+/*
+ *  Name: Utils
+ *  Description: A class which holds bunch of useful utility functions to be used throughout ezclap namespace.
+ * 
+ * 
+ */
+
 namespace ezclap
 {
 	// Default constructor. Ignore this. 
@@ -56,24 +64,23 @@ namespace ezclap
             return servicesList;
         }
 
+        /*
+         *  Description: parses app.config and returns array of strings 
+         *  Param:
+         *      - (string) sectionName = Name of the section to grab all key/value from 
+         *      - (string) keyName = Specific name of the key 
+         *      
+         *  Return:
+         *      - (string[]) values = Array of values of the key 
+         * 
+         */
         public static string[] parseConfig(string sectionName, string keyName)
         {
             var config = ConfigurationManager.GetSection(sectionName) as NameValueCollection;
-            string[] keys = config[keyName].Split(',');
+            string[] values = config[keyName].Split(',');
             
-            return keys;
+            return values;
         }
-
-        /*
-         * 
-         *             var payloadConfig = ConfigurationManager.GetSection("payload") as NameValueCollection;
-            string[] payloads = payloadConfig["name"].Split(',');
-            Console.WriteLine(payloads);
-            foreach (var payload in payloads)
-            {
-                Console.WriteLine(payload);
-            }
-         * */
 
     }
 

