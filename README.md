@@ -25,6 +25,8 @@ The following lists are the userland persistence mechanisms that are currently i
 * Userinit
 * FailureCommand
 * Image File Execution 
+* Bitsadmin - **TODO**
+* Startup Folder - **TODO** 
 
 ## Components 
 **Program.cs** - Main class which calls all userland persistence modules and executes them.
