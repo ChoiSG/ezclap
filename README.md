@@ -51,6 +51,23 @@ Sadly, EZClap currently only supports .exe payload, which means you do need to w
 #### 4. Execute EZClap 
 `./ezclap.exe 'C:\Users\Administrator\Desktop\payload.exe` 
 
+## Demo 
+
+**If you have an .exe payload, that's great. If not, or if you are feeling lazy, let's just use cmd.exe.**
+
+1. Download `ezclap.exe` from the releases page and transfer to the target
+
+2. Use `cmd.exe` or `powershell.exe` 
+
+`./ezclap 'C:\windows\system32\cmd.exe'`
+
+3. Reboot 
+
+4. Through ProcessExplorer or Task Manager, see that cmd.exes are being ran 
+
+5. See backdoor users being added 
+
+`net users` 
 
 
 
