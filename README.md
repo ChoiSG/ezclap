@@ -53,6 +53,9 @@ Sadly, EZClap currently only supports .exe payload, which means you do need to w
 #### 4. Execute EZClap 
 `./ezclap.exe 'C:\Users\Administrator\Desktop\payload.exe` 
 
+#### 5. Reboot the target and enjoy
+![Enjoy](https://i.imgur.com/yzLlzYR.png)
+
 ## Demo 
 
 **If you have an .exe payload, that's great. If not, or if you are feeling lazy, let's just use cmd.exe.**
