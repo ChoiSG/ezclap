@@ -10,8 +10,30 @@ EZClap is a proof of concept tool which was only created for educational purpose
 
 - [ ] Refactor code 
 - [ ] Support for fileless payload 
+- [ ] Implement more modules - Startup file, bitsadmin, etc 
 - [ ] Test with various payloads, not just yabnet payloads 
 - [ ] Get some feedback from colleagues because chances are this is a horrible tool 
+
+## Persistence Mechanisms
+The following lists are the userland persistence mechanisms that are currently implemented. 
+
+* WMI
+* Backdoor Users (AD and local)
+* RunKey Registry 
+* Scheduled Task
+* Accessibility
+* Userinit
+* FailureCommand
+* Image File Execution 
+
+## Components 
+**Program.cs** - Main class which calls all userland persistence modules and executes them.
+
+**app.config** - Configuration file to change payload name, registry key name, value, backdoor user names, passwords, etc. 
+
+**Add[module]** - Various userland persistence modules to be called through the `Program.cs` main class 
+
+**RegistryKeys.cs + Utils.cs** - Used for hardcoding and utility. Ignore these. 
 
 ## Installation 
 
