@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
+using System.Configuration;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace ezclap
 {
@@ -53,6 +55,25 @@ namespace ezclap
 
             return servicesList;
         }
+
+        public static string[] parseConfig(string sectionName, string keyName)
+        {
+            var config = ConfigurationManager.GetSection(sectionName) as NameValueCollection;
+            string[] keys = config[keyName].Split(',');
+            
+            return keys;
+        }
+
+        /*
+         * 
+         *             var payloadConfig = ConfigurationManager.GetSection("payload") as NameValueCollection;
+            string[] payloads = payloadConfig["name"].Split(',');
+            Console.WriteLine(payloads);
+            foreach (var payload in payloads)
+            {
+                Console.WriteLine(payload);
+            }
+         * */
 
     }
 

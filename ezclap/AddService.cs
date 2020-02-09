@@ -15,9 +15,10 @@ namespace ezclap
         *  - (string) payload = Payload to be triggered upon service start 
         * 
         * */
-        public AddService(string serviceName, string payload)
+        public AddService(string[] serviceNames, string[] payload)
         {
-            Initialize(serviceName, payload);
+            Random rnd = new Random();
+            Array.ForEach(serviceNames, element => Initialize(element, payload[rnd.Next(0, payload.Length - 1)]));
         }
 
 		public static void Initialize(string serviceName, string payload)

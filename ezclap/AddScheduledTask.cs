@@ -19,9 +19,10 @@ namespace ezclap
          *  - (int)    often                = How often the scheduled task will run in an interval 
          * 
          */
-        public AddScheduledTask(string scheduledTaskName, string payload, double often)
+        public AddScheduledTask(string[] scheduledTaskNames, string[] payload, double often)
         {
-            Initialize(scheduledTaskName, payload, often);
+            Random rnd = new Random();
+            Array.ForEach(scheduledTaskNames,element =>  Initialize(element, payload[rnd.Next(0,payload.Length-1)], often));
         }
 
 		public static void Initialize(string scheduledTaskName, string payload, double often)

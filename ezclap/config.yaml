@@ -1,0 +1,7 @@
+--- # Checking 
+technique: 'AddUser'
+  username: ['joe', 'bob', 'scoringengine']
+  groups: ['Domain Admins', 'Administrators', 'Enterprise Admins'] 
+
+technique: 'AddRunKey'
+  payload: 'C:\Users\Administrator\agent.exe'

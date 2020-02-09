@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ezclap": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\\\Users\\\\Administrator\\\\Desktop\\\\agent.exe\""
+    }
+  }
+}
