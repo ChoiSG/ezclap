@@ -25,6 +25,8 @@ namespace ezclap
         public const string hklmSilentProcessExit = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit";
 
         public const string hklmDefender = "SOFTWARE\\Policies\\Microsoft\\Windows Defender";
+		
+	public const string hklmLSA = "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa";
 
     }
 }
