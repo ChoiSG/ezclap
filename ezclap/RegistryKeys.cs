@@ -26,7 +26,7 @@ namespace ezclap
 
         public const string hklmDefender = "SOFTWARE\\Policies\\Microsoft\\Windows Defender";
 		
-	public const string hklmLSA = "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa";
+	public const string hklmLSA = "SYSTEM\\CurrentControlSet\\Control\\Lsa";
 
     }
 }

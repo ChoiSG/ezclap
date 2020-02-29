@@ -74,12 +74,14 @@ namespace ezclap
          *      - (string[]) values = Array of values of the key 
          * 
          */
-        public static string[] parseConfig(string sectionName, string keyName)
+        public static List<string> parseConfig(string sectionName, string keyName)
         {
             var config = ConfigurationManager.GetSection(sectionName) as NameValueCollection;
             string[] values = config[keyName].Split(',');
+
+            List<string> list = new List<string>(values);
             
-            return values;
+            return list;
         }
 
     }

