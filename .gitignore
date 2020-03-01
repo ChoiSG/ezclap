@@ -18,6 +18,7 @@ mono_crash.*
 
 GruntStager.exe
 ezclap.exe
+GruntStager.dll
 
 # Build results
 [Dd]ebug/
