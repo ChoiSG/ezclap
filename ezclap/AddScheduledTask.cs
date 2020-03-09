@@ -35,11 +35,20 @@ namespace ezclap
                 // Needed for creating multiple instances of the payload 
                 td.Settings.MultipleInstances = TaskInstancesPolicy.Parallel;
                 td.RegistrationInfo.Description = "Refresh Scoring Engine Workers for scoreboard";
+                
 
-                // Add interval for Scheduled task. Default 20 minutes 
+                // Add Time Trigger interval for Scheduled task.
                 TimeTrigger tt = new TimeTrigger();
                 tt.Repetition.Interval = TimeSpan.FromMinutes(often);
                 td.Triggers.Add(tt);
+
+                // Add Boot Trigger. SchTask will get triggered when the system boots up 
+                BootTrigger bt = new BootTrigger();
+                td.Triggers.Add(bt);
+
+                // Add Logon Trigger. Schetask will get triggered when a user logs in
+                LogonTrigger lt = new LogonTrigger();
+                td.Triggers.Add(lt);
 
                 // Path to action, Arguments, working directory 
                 td.Actions.Add(new ExecAction(payload, null, null));

