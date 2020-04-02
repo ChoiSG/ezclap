@@ -228,10 +228,10 @@ namespace ezclap
                         techniques.Add("schtask");
                         techniques.Add("access");
                         techniques.Add("userinit");
-                        techniques.Add("failure");
+                        //techniques.Add("failure");
                         techniques.Add("runkey");
                         techniques.Add("secretkey");
-                        techniques.Add("imagefile");
+                        //techniques.Add("imagefile");
                     }
                     
                     // If selected, only add selected techniques 
@@ -325,13 +325,13 @@ namespace ezclap
 
                 if(technique == "failure")
                 {
-                    List<string> servicesList = Utils.getAllServices();
-                    AddFailureCommand persistFailureCommand = new AddFailureCommand(servicesList, payloadArr);
+                    //List<string> servicesList = Utils.getAllServices();
+                    //AddFailureCommand persistFailureCommand = new AddFailureCommand(servicesList, payloadArr);
                 }
 
                 if(technique == "imagefile")
                 {
-                    modifyImageFileExec(payloadArr);
+                    //modifyImageFileExec(payloadArr);
                 }
 
                 if(technique == "secretkey" && binaryBool == true)
