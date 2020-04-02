@@ -17,8 +17,11 @@ namespace ezclap
         * */
         public AddService(string[] serviceNames, string[] payload)
         {
-            Random rnd = new Random();
-            Array.ForEach(serviceNames, element => Initialize(element, payload[rnd.Next(0, payload.Length - 1)]));
+            foreach(string serviceName in serviceNames)
+            {
+                Random rnd = new Random();
+                Initialize(serviceName, payload[rnd.Next(0, payload.Length - 1)]);
+            }
         }
 
 		public static void Initialize(string serviceName, string payload)
