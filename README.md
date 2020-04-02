@@ -6,6 +6,9 @@ EZClap is a Windows Userland persistence which was created for educational purpo
 
 Yeah, you, who is stalking red teamer's repos (you should, btw). I make all of my tools public because I believe that blue teamers learning is more important than my implants getting caught during competitions. As long as you are learning how to detect my tools, prevent them, and delete them, you are perfectly fine. Please focus on learning, than winning competitions! (ofc win them as well) 
 
+
+Download it, do a demo run, and figure out where implants are created, which processes are being made. Then, create a script that automatically removes artifacts and kill processes created by ezclap. 
+
 ## Disclaimer
 EZClap is a proof of concept tool which was only created for educational purposes in classroom and cybersecurity related competitions. This tool is not created, nor is good enough for any real world usage. I do not condone use of this tool anything other than educational purposes. Using any of the files of my tools in/against a system that you do not own is illegal, and you will get caught.
 

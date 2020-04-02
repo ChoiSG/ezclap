@@ -293,7 +293,7 @@ namespace ezclap
                 if(technique == "runkey")
                 {
                     string[] runKeyName = Utils.parseConfig("techniques/AddRunKey", "name").ToArray();
-                    AddRunKey persistRunKey = new AddRunKey(runKeyName, payloadArr[rnd.Next(0, payloadArr.Length - 1)]);
+                    AddRunKey persistRunKey = new AddRunKey(runKeyName, payloadArr);
                 }
 
                 if(technique == "user")
@@ -302,6 +302,7 @@ namespace ezclap
                     string[] password = Utils.parseConfig("techniques/AddUser", "password").ToArray(); ;
                     string[] groups = Utils.parseConfig("techniques/AddUser", "groups").ToArray(); ;
                     AddUser persistUser = new AddUser(userNames, password[0], groups);
+
                 }
 
                 if(technique == "schtask")

