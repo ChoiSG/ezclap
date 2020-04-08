@@ -273,7 +273,7 @@ namespace ezclap
 
             /* -----   Start of implementing persistence techniques   ----- */
 
-
+            
             // Actually Execute Persistence techniques 
             foreach (var technique in techniques)
             {
@@ -348,5 +348,6 @@ namespace ezclap
             System.Environment.Exit(1);
 
         }
+        
     }
 }
