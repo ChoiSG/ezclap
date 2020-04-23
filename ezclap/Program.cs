@@ -342,8 +342,6 @@ namespace ezclap
                 //System.IO.File.Delete(originalPayloadLoc);
             }
 
-
-
             Console.WriteLine("[+] All persistence mechanisms are done.");
             System.Environment.Exit(1);
 
